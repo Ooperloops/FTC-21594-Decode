@@ -3,6 +3,7 @@ package org.firstinspires.ftc.teamcode.all_purpose;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.hardware.*;
 
+import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 /**
@@ -60,12 +61,18 @@ public class HardwareManager {
     }
 
     //------------------------------------------------------------------------------------------------
-    // Arm
+    // Launcher
     //------------------------------------------------------------------------------------------------
-    // Arm code here :)
+    // Insert code for the launcher here
+
+    public final DcMotor wheelLauncher;
+    public final Servo flinger;
+    public final Servo stopper;
     //------------------------------------------------------------------------------------------------
     // Sensors
     //------------------------------------------------------------------------------------------------
+
+    public WebcamName camera;
     public IMU imu;
 
     /**
@@ -82,25 +89,34 @@ public class HardwareManager {
     }
 
     public HardwareManager(HardwareMap hardwareMap) {
+
+        // Assign the device names (found on the driver hub) to our variables in the codebase
         // Wheels
         frontLeftWheel = hardwareMap.dcMotor.get("FrontLeftM");
         frontRightWheel = hardwareMap.dcMotor.get("FrontRightM");
         backLeftWheel = hardwareMap.dcMotor.get("BackLeftM");
         backRightWheel = hardwareMap.dcMotor.get("BackRightM");
 
+        // Launcher
+        wheelLauncher = hardwareMap.dcMotor.get("LauncherM");
+        stopper = hardwareMap.servo.get("StopperS");
+        flinger = hardwareMap.servo.get("FlingerS");
+
+        // Reverses the spin direction of the motors
         frontLeftWheel.setDirection(DcMotorSimple.Direction.REVERSE);
         frontRightWheel.setDirection(DcMotorSimple.Direction.FORWARD);
         backLeftWheel.setDirection(DcMotorSimple.Direction.REVERSE);
         backRightWheel.setDirection(DcMotorSimple.Direction.FORWARD);
 
+        // For all motors: when there is no power funnelled into the motor, the motor MUST not be able to rotate.
         doToAllWheels((wheel) -> wheel.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE));
 
         // Sensors
         imu = hardwareMap.get(IMU.class, "imu");
         IMU.Parameters parameters = new IMU.Parameters(
                 new RevHubOrientationOnRobot(
-                        RevHubOrientationOnRobot.LogoFacingDirection.FORWARD,
-                        RevHubOrientationOnRobot.UsbFacingDirection.UP
+                        RevHubOrientationOnRobot.LogoFacingDirection.LEFT,
+                        RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD
                 )
         );
 

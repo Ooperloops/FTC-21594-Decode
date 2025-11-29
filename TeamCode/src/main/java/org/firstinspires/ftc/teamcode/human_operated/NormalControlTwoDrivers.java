@@ -15,5 +15,10 @@ public class NormalControlTwoDrivers extends HumanOperated {
     public void loop() {
         /* All functions you write in HumanOperated should be called here since this class
         extends HumanOperated */
+
+        useDefaultMovementControls();
+        useDefaultLauncherControls(player.player2);
+        SetMotorPower();
+
     }
 }
