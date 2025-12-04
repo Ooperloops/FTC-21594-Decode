@@ -90,7 +90,13 @@ public abstract class HumanOperated extends OpMode {
     }
     protected void useDefaultLauncherControls(player driver){
         Gamepad currentDriver = (driver == player.player1) ? gamepad1 : gamepad2;
-        hardwareManager.wheelLauncher.setPower(currentDriver.a ? 1 : 0);
+        if(currentDriver.a){
+            hardwareManager.wheelLauncher.setPower(1);
+        } else if (currentDriver.b){
+            hardwareManager.wheelLauncher.setPower(-0.5);
+        } else {
+            hardwareManager.wheelLauncher.setPower(0);
+        }
 
         //Stopper
         if(currentDriver.right_bumper){
@@ -101,15 +107,15 @@ public abstract class HumanOperated extends OpMode {
 
         //Flinger
         if(currentDriver.left_bumper){
-            hardwareManager.flinger.setPosition(0.05);
+            hardwareManager.flinger.setPosition(0.05); // Up Position = 0.05
         } else if (currentDriver.left_trigger > 0){
-            hardwareManager.flinger.setPosition(0.3);
+            hardwareManager.flinger.setPosition(0.38); // Down Position = 0.38
         }
 
     }
 
     protected void zeroAllServos(){
-        hardwareManager.flinger.setPosition(0.3);
+        hardwareManager.flinger.setPosition(0.38);
         hardwareManager.stopper.setPosition(0);
     }
 

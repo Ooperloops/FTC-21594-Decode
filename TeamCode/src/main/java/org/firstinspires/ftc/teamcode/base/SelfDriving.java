@@ -6,6 +6,7 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.all_purpose.HardwareManager;
 
 /**
@@ -58,19 +59,58 @@ public abstract class SelfDriving extends LinearOpMode {
         hardwareManager.doToAllWheels((wheel) -> wheel.setPower(0));
     }
 
-    protected void moveForSeconds(double milliseconds){
-        elapsedTime.startTime(); // Start timer...
+    protected void moveForSeconds(double seconds){
+        if (!opModeIsActive())
+            return;
+
+
+
+        //elapsedTime.reset();
+        elapsedTime.reset();  // Start timer...
 
         hardwareManager.doToAllWheels((wheel) -> wheel.setPower(MOVEMENT_POWER)); // Run all wheels at set power...
-
-        while (opModeIsActive() && milliseconds >= elapsedTime.milliseconds()){ // While the timer is less than time requested
+        boolean running = true;
+        while (opModeIsActive() && running){ // While the timer is less than time requested
             idle();
+            if(seconds < elapsedTime.seconds()){
+                running = false;
+                telemetry.update();
+            }
         }
         // Once while has stopped
         hardwareManager.doToAllWheels((wheel) -> wheel.setPower(0)); // Set all wheels to 0 power
-        elapsedTime.reset(); // reset timer
     }
 
+    //------------------------------------------------------------------------------------------------
+    // Launcher
+    //------------------------------------------------------------------------------------------------
+    protected void launch(int ballsLaunched){
+        hardwareManager.wheelLauncher.setPower(1);
+        // Set timer
+        waitForSeconds(2);
+
+        for(int x = 0; x < ballsLaunched; x++){
+
+            hardwareManager.flinger.setPosition(0.05);
+            waitForSeconds(0.5);
+            hardwareManager.flinger.setPosition(0.38);
+            waitForSeconds(0.5);
+        }
+        hardwareManager.wheelLauncher.setPower(0);
+        // Let wheel motor run for N seconds
+        // Once timer > n seconds then
+        // set servo position to 0.05
+        // somehow find a way to make it wait for 2 seconds
+        // set motor power to 0
+        // set servo position to 0.38
+
+    }
+    protected void waitForSeconds(double seconds){
+        elapsedTime.reset();
+        while(opModeIsActive() && elapsedTime.seconds() <= seconds){
+            idle();
+        }
+    }
     //------------------------------------------------------------------------------------------------
     // Rotation
     //------------------------------------------------------------------------------------------------
@@ -91,6 +131,8 @@ public abstract class SelfDriving extends LinearOpMode {
         hardwareManager.backRightWheel.setPower(rightPower);
 
         while(opModeIsActive() && hasReachedDesiredAngle(initialAngle, degreeAngle)) {
+            telemetry.addData("current deg: ", hardwareManager.getCurrentDegreeHeading());
+            telemetry.update();
             idle();
         }
 
@@ -112,6 +154,7 @@ public abstract class SelfDriving extends LinearOpMode {
     @Override
     public void runOpMode() {
         hardwareManager = new HardwareManager(hardwareMap);
+        elapsedTime = new ElapsedTime();
         waitForStart();
         runAutonomous();
     }
