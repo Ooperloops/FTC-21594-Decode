@@ -4,14 +4,12 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 import org.firstinspires.ftc.teamcode.base.SelfDriving;
 
-@Autonomous(name = "Red Side Auto", group = "Autonomous")
-public class RedSideAuto extends SelfDriving {
+@Autonomous(name = "67 DUMMY AUTO", group = "Autonomous")
+public class UselessAuto extends SelfDriving {
 
     @Override
     protected void runAutonomous() {
-       move(0.3);
-       rotate(45);
-       move(2.5);
-       launch(3);
+       moveForSeconds(1.5);
+       rotate(50);
     }
 }

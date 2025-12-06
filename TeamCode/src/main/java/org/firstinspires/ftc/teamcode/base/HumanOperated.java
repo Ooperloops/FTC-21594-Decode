@@ -51,6 +51,11 @@ public abstract class HumanOperated extends OpMode {
     protected final double SERVO_UPPER_POWER_LIMIT = 0.8; // VEX Servos Actual Limitation
     protected final double SERVO_LOWER_POWER_LIMIT = -0.8; // VEX Servos Actual Limitation
     protected double MOTOR_SHRINK_MULTIPLIER = 0.3;
+    //------------------------------------------------------------------------------------------------
+    // Launcher
+    //------------------------------------------------------------------------------------------------
+    protected boolean launcherSpeedPauseOn = false;
+    protected double pausedLauncherSpeed = 0;
 
     //------------------------------------------------------------------------------------------------
     // Defaults
@@ -90,13 +95,31 @@ public abstract class HumanOperated extends OpMode {
     }
     protected void useDefaultLauncherControls(player driver){
         Gamepad currentDriver = (driver == player.player1) ? gamepad1 : gamepad2;
+
+        // Holy mother of god what in the world is this GENERATIONAL IF
         if(currentDriver.a){
             hardwareManager.wheelLauncher.setPower(1);
-        } else if (currentDriver.b){
+        } else if (currentDriver.b) {
             hardwareManager.wheelLauncher.setPower(-0.5);
+        }else if (currentDriver.x){
+
+            // Pause and keep the current speed of the motor active from the left joystick
+            launcherSpeedPauseOn = true;
+            pausedLauncherSpeed = currentDriver.left_stick_y;
+            telemetry.addData("!! PAUSE STATUS !! -> ", "ON");
+            telemetry.addData("!! LAUNCHER SPEED (%) !! -> ", pausedLauncherSpeed * -100);
+        }else if (currentDriver.y){
+
+            // Unpause and let the joystick dictate the speed again
+            launcherSpeedPauseOn = false;
+            telemetry.addData("!! PAUSE STATUS !! -> ", "OFF");
         } else {
-            hardwareManager.wheelLauncher.setPower(0);
+            double activeSpeed = launcherSpeedPauseOn ? pausedLauncherSpeed : currentDriver.left_stick_y;
+            hardwareManager.wheelLauncher.setPower(-activeSpeed);
+
         }
+
+
 
         //Stopper
         if(currentDriver.right_bumper){
@@ -112,6 +135,7 @@ public abstract class HumanOperated extends OpMode {
             hardwareManager.flinger.setPosition(0.38); // Down Position = 0.38
         }
 
+        telemetry.update();
     }
 
     protected void zeroAllServos(){
